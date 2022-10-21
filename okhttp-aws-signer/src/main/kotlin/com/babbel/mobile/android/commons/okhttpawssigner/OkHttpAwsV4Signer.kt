@@ -9,8 +9,8 @@ import okhttp3.Request
  * More details [here](https://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html)
  */
 class OkHttpAwsV4Signer(
-    private val region: String,
-    private val service: String
+    private val region: String?,
+    private val service: String?
 ) {
     /**
      * Sign the given request with the given credentials.
