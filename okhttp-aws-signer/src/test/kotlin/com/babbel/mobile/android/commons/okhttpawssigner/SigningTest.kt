@@ -1,5 +1,6 @@
 package com.babbel.mobile.android.commons.okhttpawssigner
 
+import com.babbel.mobile.android.commons.okhttpawssigner.internal.SigningArgs
 import com.babbel.mobile.android.commons.okhttpawssigner.internal.stringToSign
 import com.babbel.mobile.android.commons.okhttpawssigner.testhelpers.ResourceHelper
 import com.babbel.mobile.android.commons.okhttpawssigner.testhelpers.headers
@@ -286,7 +287,7 @@ class SigningTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(SigningArgs(accessKeyId = "accessKeyId", accessKey = "accessKey", region = "us-east-1", service = "service"))
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla-query-unreserved.sts"))
     }

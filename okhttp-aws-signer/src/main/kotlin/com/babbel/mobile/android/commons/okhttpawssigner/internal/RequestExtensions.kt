@@ -11,43 +11,47 @@ internal const val SIGNING_ALGORITHM = "AWS4-HMAC-SHA256"
 /**
  * Sign the request with the aws signature needed
  */
-internal fun Request.signed(accessKeyId: String, accessKey: String, region: String, service: String) =
+internal fun Request.signed(args: SigningArgs) =
     newBuilder()
-        .header("Authorization", awsAuthorizationHeader(accessKeyId, accessKey, region, service))
+        .header("Authorization", awsAuthorizationHeader(args))
         .build()
 
-internal fun Request.awsAuthorizationHeader(accesKeyId: String, accessKey: String, region: String, service: String) =
-    "$SIGNING_ALGORITHM Credential=$accesKeyId/${credentialScope(
-        region,
-        service
+internal fun Request.awsAuthorizationHeader(args: SigningArgs) =
+    "$SIGNING_ALGORITHM Credential=${args.accessKeyId}/${credentialScope(
+        args
     )}, SignedHeaders=${signedHeaders()}, Signature=${signature(
-        accessKey,
-        region,
-        service
+        args
     )}"
 
 /**
  * Calculate the signature according to [this](https://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html)
  */
-internal fun Request.signature(accessKey: String, region: String, service: String) =
-    hmacSha256(
+internal fun Request.signature(args: SigningArgs): String =
+    if (args.region != null && args.service != null) {
         hmacSha256(
             hmacSha256(
-                hmacSha256(hmacSha256("AWS4$accessKey", amazonDateHeaderShort()), region),
-                service
-            ), "aws4_request"
-        ),
-        stringToSign(region, service)
-    ).toHexString()
+                hmacSha256(
+                    hmacSha256(hmacSha256("AWS4${args.accessKey}", amazonDateHeaderShort()), args.region),
+                    args.service
+                ), "aws4_request"
+            ),
+            stringToSign(args)
+        ).toHexString()
+    } else {
+        hmacSha256(
+            hmacSha256(hmacSha256("AWS4${args.accessKey}", amazonDateHeaderShort()), "aws4_request"),
+            stringToSign(args)
+        ).toHexString()
+    }
 
 /**
  * Create a string to sign as described [here](https://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html)
  */
-internal fun Request.stringToSign(region: String, service: String) =
+internal fun Request.stringToSign(args: SigningArgs) =
     """
     |$SIGNING_ALGORITHM
     |${amazonDateHeader()}
-    |${credentialScope(region, service)}
+    |${credentialScope(args)}
     |${hash(canonicalRequest())}
     """.trimMargin("|")
 
@@ -146,5 +150,15 @@ private fun String.rfc3986Encode() =
         .replace("*", "%2A")
         .replace("%7E", "~")
 
-private fun Request.credentialScope(region: String, service: String) =
-    "${amazonDateHeaderShort()}/$region/$service/aws4_request"
+private fun Request.credentialScope(signingArgs: SigningArgs): String {
+    val components = mutableListOf<String>()
+    components.add(amazonDateHeaderShort())
+    signingArgs.region?.let {
+        components.add(it)
+    }
+    signingArgs.service?.let {
+        components.add(it)
+    }
+    components.add("aws4_request")
+    return components.joinToString { "/" }
+}

@@ -1,5 +1,6 @@
 package com.babbel.mobile.android.commons.okhttpawssigner
 
+import com.babbel.mobile.android.commons.okhttpawssigner.internal.SigningArgs
 import com.babbel.mobile.android.commons.okhttpawssigner.internal.stringToSign
 import com.babbel.mobile.android.commons.okhttpawssigner.testhelpers.ResourceHelper
 import com.babbel.mobile.android.commons.okhttpawssigner.testhelpers.headers
@@ -11,6 +12,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
 class StringToSignTest {
+
+    private fun generateTestSigningArgs(): SigningArgs {
+        return SigningArgs("accessKeyId", "accessKey", "us-east-1", "service")
+    }
+
     @Test
     fun `string to sign with simple get request and 1 header`() {
         val request = request {
@@ -24,7 +30,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-header-value-order.sts"))
     }
@@ -43,7 +49,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-header-value-trim.sts"))
     }
@@ -62,7 +68,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-query-empty.sts"))
     }
@@ -81,7 +87,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-query-time-stamp.sts"))
     }
@@ -98,7 +104,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-slashes.sts"))
     }
@@ -115,7 +121,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-slash.sts"))
     }
@@ -132,7 +138,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-space.sts"))
     }
@@ -149,7 +155,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-unreserved.sts"))
     }
@@ -166,7 +172,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-utf8.sts"))
     }
@@ -183,7 +189,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla-empty-query-key.sts"))
     }
@@ -200,7 +206,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla-query-order-key-case.sts"))
     }
@@ -217,7 +223,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla-query-order-key.sts"))
     }
@@ -235,7 +241,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla-query-unreserved.sts"))
     }
@@ -252,7 +258,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla-utf8-query.sts"))
     }
@@ -269,7 +275,7 @@ class StringToSignTest {
             get()
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("get-vanilla.sts"))
     }
@@ -286,7 +292,7 @@ class StringToSignTest {
             post(RequestBody.create(MediaType.parse("application/json"), ""))
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("post-header-key-case.sts"))
     }
@@ -304,7 +310,7 @@ class StringToSignTest {
             post(RequestBody.create(MediaType.parse("application/json"), ""))
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("post-header-value-case.sts"))
     }
@@ -322,7 +328,7 @@ class StringToSignTest {
             post(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), "Param1=value1"))
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("post-x-www-form-urlencoded.sts"))
     }
@@ -339,7 +345,7 @@ class StringToSignTest {
             post(RequestBody.create(MediaType.parse("application/json"), ""))
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("post-vanilla-empty-query-value.sts"))
     }
@@ -356,7 +362,7 @@ class StringToSignTest {
             post(RequestBody.create(MediaType.parse("application/json"), ""))
         }
 
-        val result = request.stringToSign("us-east-1", "service")
+        val result = request.stringToSign(generateTestSigningArgs())
 
         assertThat(result).isEqualTo(ResourceHelper.readResource("post-vanilla.sts"))
     }
